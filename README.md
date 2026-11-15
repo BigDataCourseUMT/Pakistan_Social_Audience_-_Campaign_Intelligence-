@@ -1,15 +1,21 @@
 # Pakistan Social Audience and Campaign Intelligence
 
-A Streamlit project that uses the supplied P1 Pakistani fashion YouTube data to compare video formats, group similar comment needs, flag unusual engagement patterns, and turn findings into practical test ideas. The clustering is unsupervised; this project complements rather than replaces Project 1 sentiment classification.
+A Streamlit project for comparing available content formats, finding audience needs in comments, flagging unusual engagement, and turning those findings into marketing tests. It uses P1's supplied YouTube records by default and keeps P2's simulated campaign-planning summaries separate.
 
 ## What's in this folder
 
 - `app.py` — interactive dashboard and analysis
 - `data/p1_youtube_video_analytics.csv` — P1 video analytics export (525 videos)
 - `data/p1_youtube_comments_sentiment.csv` — P1 comments export (8,641 comments)
+- `data/p2_platform_performance_synthetic.csv` — P2 simulated platform advertising results
+- `data/p2_campaign_performance_synthetic.csv` — P2 simulated campaign results
+- `data/p2_budget_plan_synthetic.csv` — P2 simulated allocation plan
+- `data/p2_platform_performance_synthetic.csv` — P2 simulated platform advertising results
+- `data/p2_campaign_performance_synthetic.csv` — P2 simulated campaign results
+- `data/p2_budget_plan_synthetic.csv` — P2 simulated budget allocation
 - `requirements.txt` — Python dependencies
 
-**Data scope:** the default data is copied from the project's P1 YouTube exports. It is not Instagram or TikTok data. Shares, language labels, and purchase-intent labels are not present in the supplied CSVs. The app leaves these unavailable or unlabeled and does not treat them as observed values. The P1 sentiment prediction column is retained as a reference, but clustering is based on comment text.
+**Data scope:** P1 provides YouTube records, not Instagram, TikTok, or Facebook posts. P2's README describes its advertising data as synthetic; its platform and campaign summaries are shown separately and never merged with P1 observations. The default format comparison can distinguish YouTube Shorts from standard videos only. Add permitted real posts/comments as described below for Reels, product photos, influencer content, sale/Eid campaigns, and cross-platform needs analysis. P1 lacks shares and hand-labeled comment topics/languages, so the app marks them unavailable or inferred.
 
 ## 1. Install VS Code and Python
 
@@ -34,15 +40,15 @@ streamlit run app.py
 
 The app opens in a browser at `http://localhost:8501`. Keep the terminal open while using it. The default source is the supplied P1 YouTube data. Stop the server with `Ctrl+C` in the terminal.
 
-## 3. Prepare permitted data
+## 3. Compare more content types and discover audience needs
 
-You can upload two CSV files from the sidebar. Required columns:
+The default view compares Shorts with standard YouTube videos. To compare the brief's formats across Instagram, TikTok, or Facebook, use permitted records from those platforms. Put them in `data/custom_posts.csv` and `data/custom_comments.csv`, then select **CSV files in data folder**; or choose **Upload CSV files** in the sidebar.
 
-**Posts CSV:** `post_id, brand, platform, campaign, content_type, product_category, likes, comments_count, shares, views, days_since_post`
+Posts must include `post_id, brand, platform, campaign, content_type, product_category, likes, comments_count`. Add `views`, `shares`, `days_since_post`, and `source_url` where available.
 
-**Comments CSV:** `comment_id, post_id, comment_text, language_type, topic, sentiment, purchase_intent`
+Comments must include `post_id, comment_text`. Add `comment_id`, `topic`, `language_type`, `sentiment_ml`, and `published_at` when available. Keep the same post ID in both CSVs. If a real, human-reviewed `topic` is supplied, the app uses it; otherwise it applies transparent English/Roman Urdu/Urdu-script keyword rules for price, discount, delivery, sizing, product quality, availability, purchase intent, and positive feedback. It groups unmatched comments with character n-gram TF-IDF and K-Means to suggest themes. Review the examples and counts before reporting inferred needs as findings.
 
-`topic`, `sentiment`, and `purchase_intent` can be included for your research records; the clustering uses comment text, not those labels. Numeric engagement columns should contain numbers. Use a consistent post ID between the two files. Missing/unavailable metrics may be left blank. Remove names, handles, phone numbers, and other personal data before upload. Uploads are processed in the current app session and are not saved by this app.
+For a meaningful cross-platform content-format comparison, include real posts from each format (for example Reels, product photos, influencer posts, styling videos, and sale/Eid posts), plus campaign, platform, and post age fields. If views are unavailable, engagement-rate comparisons will be unavailable for those rows. Record source URL, collection date, and reuse permission in your research notes. Remove private customer identifiers before upload; uploaded files are processed for the current session and are not saved by the app.
 
 ## 4. GitHub repository
 
@@ -61,14 +67,15 @@ git push
 1. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/) with GitHub and grant access to the repository. Deployment requires admin access to that GitHub repository.
 2. Click **Create app**, select the repository, branch `main`, and main file path `app.py`.
 3. Select a supported Python version (3.11 or 3.12), then deploy. Community Cloud installs dependencies from `requirements.txt`.
-4. Open the generated `*.streamlit.app` URL and check the P1 data source and dashboard tabs. Each push to the deployed branch updates the app.
+4. Open the generated `*.streamlit.app` URL and check the content comparison, audience-need groups, and P2 synthetic-planning tab. Each push to the deployed branch updates the app.
 
 No API key or secrets are needed for this version. If you add credentials later, store them in Streamlit's **Advanced settings → Secrets**, and never commit them to GitHub.
 
 ## How to explain the analysis
 
-- **Content performance:** median engagement rate by content format. The P1 YouTube source has no share metric, so rate = `(likes + comments) / views × 100`; this comparison is descriptive and may be biased by video age, channel size, paid promotion, and missing metrics.
-- **Audience groups:** TF-IDF vectorization and K-Means group similar comment text. The displayed words are clues for manual interpretation; clusters are not validated customer segments, and Roman Urdu/Urdu results need human review.
+- **Content performance:** median engagement rate by format. The P1 YouTube source supports a Shorts vs standard-video comparison and has no share metric, so rate = `(likes + comments) / views × 100`. Format is inferred from video title/hashtags. This is descriptive and may be biased by video age, channel size, and paid promotion.
+- **Audience needs:** transparent English/Roman Urdu/Urdu-script keyword patterns surface common need categories. Unmatched comments are grouped with character n-gram TF-IDF and K-Means; those cluster keywords are leads to inspect, not validated customer segments.
+- **P2 planning context:** P2 platform/campaign/budget summaries are synthetic. They can suggest hypotheses for later real campaign tests, but must not be reported as real brand performance or combined with P1 YouTube observations.
 - **Unusual posts:** a robust median-absolute-deviation threshold flags engagement rates that differ from the dataset. A flag is a review prompt, not evidence of manipulation or success.
 - **Recommendations:** suggest candidate content and message tests from observed patterns. Use controlled comparisons and sales or qualified inquiry outcomes to assess results.
 
